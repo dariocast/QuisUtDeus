@@ -25,18 +25,18 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        Incontro incontro = new Incontro("titolo","data","luogo","occasione",Tipo.CELEBRAZIONE,"mediaType","url");
+        Incontro incontro = new Incontro("titolo","data","luogo","occasione",R.drawable.celebrazione,"mediaType","url");
         Incontro[] incontri = new Incontro[]{incontro};
         adapter = new IncontroAdapter(MainActivity.this,R.layout.incontro_list_item,incontri);
 
-        ListView lv_lista = (ListView) findViewById(R.id.lv_lista);
+        ListView lv_lista = findViewById(R.id.lv_lista);
         lv_lista.setAdapter(adapter);
 
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab_refresh);
+        FloatingActionButton fab = findViewById(R.id.fab_refresh);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
