@@ -10,13 +10,15 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.util.List;
+
 public class IncontroAdapter extends ArrayAdapter<Incontro> {
 
     Context context;
     int layoutResourceId;
-    Incontro data[] = null;
+    List<Incontro> data = null;
 
-    public IncontroAdapter(Context context, int layoutResourceId, Incontro[] data) {
+    public IncontroAdapter(Context context, int layoutResourceId, List<Incontro> data) {
         super(context, layoutResourceId, data);
         this.layoutResourceId = layoutResourceId;
         this.context = context;
@@ -48,7 +50,7 @@ public class IncontroAdapter extends ArrayAdapter<Incontro> {
             holder = (IncontroHolder)row.getTag();
         }
 
-        Incontro Incontro = data[position];
+        Incontro Incontro = data.get(position);
         holder.img_incontro.setImageResource(Incontro.momento);
         holder.tv_titolo.setText(Incontro.titolo);
         holder.tv_data.setText(Incontro.data);
