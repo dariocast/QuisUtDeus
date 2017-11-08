@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name">QuisUtDeus</string>
     <string name="action_settings">Settings</string>
+    <string name="view">view</string>
+    <string name="previous">previous</string>
+    <string name="next">next</string>
 </resources>

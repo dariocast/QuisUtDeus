@@ -1,14 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context="it.pentagono.app.quisutdeus.PDFActivity">
+    android:layout_height="match_parent">
 
-    <WebView
+    <Button
+        android:id="@+id/btn_render"
+        style="?android:attr/buttonBarButtonStyle"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:layout_margin="15dp"
+        android:text="@string/view"
+        android:textSize="20sp" />
+
+    <LinearLayout
+        android:id="@+id/fragment_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/webview"></WebView>
+        android:orientation="horizontal"
+        android:visibility="gone">
 
-</android.support.constraint.ConstraintLayout>
+    </LinearLayout>
+
+</RelativeLayout>
