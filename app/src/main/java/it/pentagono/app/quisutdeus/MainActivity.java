@@ -1,5 +1,6 @@
 package it.pentagono.app.quisutdeus;
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -57,7 +58,10 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Incontro item = (Incontro) lv_lista.getItemAtPosition(i);
-                Toast.makeText(MainActivity.this,"You selected : " + item.titolo,Toast.LENGTH_SHORT).show();
+                Intent pdfIntent = new Intent();
+                pdfIntent.setClass(MainActivity.this,PDFActivity.class);
+                pdfIntent.putExtra("url",item.url);
+                startActivity(pdfIntent);
             }
         });
 
