@@ -8,11 +8,11 @@ public class Incontro {
     String data;
     String luogo;
     String occasione;
-    int momento;
+    String momento;
     String mediaType;
     String url;
 
-    public Incontro(String titolo, String data, String luogo, String occasione, int momento, String mediaType, String url) {
+    public Incontro(String titolo, String data, String luogo, String occasione, String momento, String mediaType, String url) {
         this.titolo = titolo;
         this.data = data;
         this.luogo = luogo;
@@ -28,7 +28,7 @@ public class Incontro {
                 incontro.getString("data"),
                 incontro.getString("luogo"),
                 incontro.getString("occasione"),
-                incontro.getInt("momento"),
+                incontro.getString("momento"),
                 incontro.getString("mediaType"),
                 incontro.getString("url")
         );

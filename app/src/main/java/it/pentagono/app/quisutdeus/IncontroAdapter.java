@@ -25,6 +25,7 @@ public class IncontroAdapter extends ArrayAdapter<Incontro> {
         this.data = data;
     }
 
+
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         View row = convertView;
@@ -51,7 +52,7 @@ public class IncontroAdapter extends ArrayAdapter<Incontro> {
         }
 
         Incontro Incontro = data.get(position);
-        holder.img_incontro.setImageResource(Incontro.momento);
+        holder.img_incontro.setImageResource(Incontro.momento.equals("celebrazione")? R.drawable.celebrazione : R.drawable.preghiera);
         holder.tv_titolo.setText(Incontro.titolo);
         holder.tv_data.setText(Incontro.data);
         holder.tv_luogo.setText(Incontro.luogo);

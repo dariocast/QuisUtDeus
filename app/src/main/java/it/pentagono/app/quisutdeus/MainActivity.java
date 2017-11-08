@@ -2,8 +2,6 @@ package it.pentagono.app.quisutdeus;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -11,8 +9,10 @@ import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -32,6 +32,7 @@ public class MainActivity extends AppCompatActivity {
 
     ArrayList<Incontro> incontri;
     IncontroAdapter adapter;
+    ListView lv_lista;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,14 +41,25 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        final ListView lv_lista = findViewById(R.id.lv_lista);
+        lv_lista = findViewById(R.id.lv_lista);
 
-        Incontro incontro = new Incontro("titolo","data","luogo","occasione",R.drawable.celebrazione,"mediaType","url");
-        new Getter().execute();
+        try {
+            incontri = new Getter().execute().get();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
 
         adapter = new IncontroAdapter(MainActivity.this,R.layout.incontro_list_item,incontri);
-
         lv_lista.setAdapter(adapter);
+        lv_lista.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                Incontro item = (Incontro) lv_lista.getItemAtPosition(i);
+                Toast.makeText(MainActivity.this,"You selected : " + item.titolo,Toast.LENGTH_SHORT).show();
+            }
+        });
 
     }
 
@@ -80,32 +92,31 @@ public class MainActivity extends AppCompatActivity {
         protected ArrayList<Incontro> doInBackground(Void... voids) {
             OkHttpClient client = new OkHttpClient();
             Request request = new Request.Builder()
+                    .addHeader("content-type","application/json")
+                    .get()
                     .url(url)
                     .build();
 
             Response response = null;
-            JSONArray jsonArray = new JSONArray();
+            JSONArray jsonArray = null;
             ArrayList<Incontro> toReturn = null;
             try {
                 response = client.newCall(request).execute();
-                jsonArray = new JSONArray(response.body().string());
-                toReturn =  new ArrayList<Incontro>();
+                jsonArray = new JSONArray(response.body().string().toString());
+                toReturn =  new ArrayList<>();
 
                 for(int i = 0; i < jsonArray.length(); i++) {
                     toReturn.add(new Incontro(jsonArray.getJSONObject(i)));
                 }
             } catch (JSONException e) {
                 Log.e("ERROR","Quis Ut Deus - Background, Error while creating json");
+                e.printStackTrace();
             } catch (IOException e) {
                 Log.e("ERROR","Quis Ut Deus - Background, Error while getting body from request");
+                e.printStackTrace();
             }
 
             return toReturn;
-        }
-
-        @Override
-        protected void onPostExecute(ArrayList<Incontro> listaIncontri) {
-            incontri = listaIncontri;
         }
     }
 }
