@@ -59,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Incontro item = (Incontro) lv_lista.getItemAtPosition(i);
                 Intent pdfIntent = new Intent();
-                pdfIntent.setClass(MainActivity.this,PDFActivity.class);
+                pdfIntent.setClass(MainActivity.this,StreamingMp3Player.class);
                 pdfIntent.putExtra("url",item.url);
                 startActivity(pdfIntent);
             }
