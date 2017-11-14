@@ -22,6 +22,7 @@ public class StreamingMp3Player extends Activity implements OnClickListener, OnT
 
     private ImageButton buttonPlayPause;
     private SeekBar seekBarProgress;
+    public EditText editTextSongURL;
 
     private MediaPlayer mediaPlayer;
     private int mediaFileLengthInMilliseconds; // this value contains the song duration in milliseconds. Look at getDuration() method in MediaPlayer class
@@ -36,8 +37,15 @@ public class StreamingMp3Player extends Activity implements OnClickListener, OnT
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.mp3);
+        initView();
         Intent incoming = getIntent();
         url = incoming.getStringExtra("url");
+    }
+
+    /**
+     * This method initialise all the views in project
+     */
+    private void initView() {
         buttonPlayPause = (ImageButton) findViewById(R.id.ButtonTestPlayPause);
         buttonPlayPause.setOnClickListener(this);
 
