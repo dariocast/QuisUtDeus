@@ -1,8 +1,13 @@
 package it.pentagono.app.quisutdeus;
 
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -35,36 +40,58 @@ public class MainActivity extends AppCompatActivity {
     IncontroAdapter adapter;
     ListView lv_lista;
 
+    public boolean isConnected() {
+        ConnectivityManager cm =
+                (ConnectivityManager)MainActivity.this.getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        NetworkInfo activeNetwork = cm!=null?cm.getActiveNetworkInfo():null;
+        return activeNetwork != null &&
+                activeNetwork.isConnectedOrConnecting();
+
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        if(!isConnected()) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setMessage("Controlla la connessione Internet!")
+                    .setTitle("Internet assente")
+                    .setCancelable(true)
+                    .setOnCancelListener(new DialogInterface.OnCancelListener() {
+                        @Override
+                        public void onCancel(DialogInterface dialogInterface) {
+                            recreate();
+                        }
+                    });
+            AlertDialog dialog = builder.create();
+            dialog.show();
+        } else {
+            lv_lista = findViewById(R.id.lv_lista);
 
-        lv_lista = findViewById(R.id.lv_lista);
-
-        try {
-            incontri = new Getter().execute().get();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        }
-
-        adapter = new IncontroAdapter(MainActivity.this,R.layout.incontro_list_item,incontri);
-        lv_lista.setAdapter(adapter);
-        lv_lista.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Incontro item = (Incontro) lv_lista.getItemAtPosition(i);
-                Intent pdfIntent = new Intent();
-                pdfIntent.setClass(MainActivity.this,StreamingMp3Player.class);
-                pdfIntent.putExtra("url",item.url);
-                startActivity(pdfIntent);
+            try {
+                incontri = new Getter().execute().get();
+            } catch (InterruptedException | ExecutionException e) {
+                e.printStackTrace();
             }
-        });
 
+            adapter = new IncontroAdapter(MainActivity.this,R.layout.incontro_list_item,incontri);
+            lv_lista.setAdapter(adapter);
+            lv_lista.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                    Incontro item = (Incontro) lv_lista.getItemAtPosition(i);
+                    Intent mp3Intent = new Intent();
+                    mp3Intent.setClass(MainActivity.this,StreamingMp3Player.class);
+                    mp3Intent.putExtra("url",item.url);
+                    mp3Intent.putExtra("incontro",item.getAsBundle());
+                    startActivity(mp3Intent);
+                }
+            });
+        }
     }
 
     @Override

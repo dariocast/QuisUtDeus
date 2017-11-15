@@ -16,19 +16,25 @@ import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.SeekBar;
+import android.widget.TextView;
+
+import java.util.concurrent.TimeUnit;
 
 public class StreamingMp3Player extends Activity implements OnClickListener, OnTouchListener, OnCompletionListener, OnBufferingUpdateListener {
 
     private ImageButton buttonPlayPause;
     private SeekBar seekBarProgress;
-    public EditText editTextSongURL;
+    private TextView tempo;
 
     private MediaPlayer mediaPlayer;
     private int mediaFileLengthInMilliseconds; // this value contains the song duration in milliseconds. Look at getDuration() method in MediaPlayer class
 
     private final Handler handler = new Handler();
     String url;
+    Incontro incontro;
+
 
     /**
      * Called when the activity is first created.
@@ -37,15 +43,16 @@ public class StreamingMp3Player extends Activity implements OnClickListener, OnT
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.mp3);
-        initView();
         Intent incoming = getIntent();
         url = incoming.getStringExtra("url");
-    }
+        incontro = Incontro.getFromBundle(incoming.getBundleExtra("incontro"));
 
-    /**
-     * This method initialise all the views in project
-     */
-    private void initView() {
+        ((ImageView) findViewById(R.id.img_incontro)).setImageResource(incontro.momento.equals("celebrazione")? R.drawable.celebrazione : R.drawable.preghiera);
+        ((TextView) findViewById(R.id.tv_titolo)).setText(incontro.titolo);
+        ((TextView) findViewById(R.id.tv_data)).setText(incontro.data);
+        ((TextView) findViewById(R.id.tv_luogo)).setText(incontro.luogo);
+        ((TextView) findViewById(R.id.tv_occasione)).setText(incontro.occasione);
+
         buttonPlayPause = (ImageButton) findViewById(R.id.ButtonTestPlayPause);
         buttonPlayPause.setOnClickListener(this);
 
@@ -53,9 +60,23 @@ public class StreamingMp3Player extends Activity implements OnClickListener, OnT
         seekBarProgress.setMax(99); // It means 100% .0-99
         seekBarProgress.setOnTouchListener(this);
 
+        tempo = (TextView) findViewById(R.id.tv_tempo);
+
         mediaPlayer = new MediaPlayer();
         mediaPlayer.setOnBufferingUpdateListener(this);
         mediaPlayer.setOnCompletionListener(this);
+        try {
+            mediaPlayer.setDataSource(url);
+            mediaPlayer.prepare(); // you must call this method after setup the datasource in setDataSource method. After calling prepare() the instance of MediaPlayer starts load data from URL to internal buffer.
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        mediaFileLengthInMilliseconds = mediaPlayer.getDuration(); // gets the song length in milliseconds from URL
+        tempo.setText(String.format("%d.%d",
+                TimeUnit.MILLISECONDS.toMinutes(mediaFileLengthInMilliseconds),
+                TimeUnit.MILLISECONDS.toSeconds(mediaFileLengthInMilliseconds) -
+                        TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(mediaFileLengthInMilliseconds))
+        ));
     }
 
     /**
@@ -76,15 +97,6 @@ public class StreamingMp3Player extends Activity implements OnClickListener, OnT
     @Override
     public void onClick(View v) {
         if (v.getId() == R.id.ButtonTestPlayPause) {
-            /** ImageButton onClick event handler. Method which start/pause mediaplayer playing */
-            try {
-                mediaPlayer.setDataSource(url);
-                mediaPlayer.prepare(); // you must call this method after setup the datasource in setDataSource method. After calling prepare() the instance of MediaPlayer starts load data from URL to internal buffer.
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-            mediaFileLengthInMilliseconds = mediaPlayer.getDuration(); // gets the song length in milliseconds from URL
 
             if (!mediaPlayer.isPlaying()) {
                 mediaPlayer.start();
@@ -115,6 +127,26 @@ public class StreamingMp3Player extends Activity implements OnClickListener, OnT
     public void onCompletion(MediaPlayer mp) {
         /** MediaPlayer onCompletion event handler. Method which calls then song playing is complete*/
         buttonPlayPause.setImageResource(R.drawable.button_play);
+        mp.seekTo(0);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (mediaPlayer.isPlaying()) {
+            mediaPlayer.pause();
+            buttonPlayPause.setImageResource(R.drawable.button_play);
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (mediaPlayer.isPlaying()) {
+            mediaPlayer.pause();
+            mediaPlayer.seekTo(0);
+            buttonPlayPause.setImageResource(R.drawable.button_play);
+        }
     }
 
     @Override
@@ -122,4 +154,5 @@ public class StreamingMp3Player extends Activity implements OnClickListener, OnT
         /** Method which updates the SeekBar secondary progress by current song loading from URL position*/
         seekBarProgress.setSecondaryProgress(percent);
     }
+
 }

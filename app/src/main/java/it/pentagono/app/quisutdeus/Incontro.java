@@ -1,5 +1,7 @@
 package it.pentagono.app.quisutdeus;
 
+import android.os.Bundle;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -45,5 +47,30 @@ public class Incontro {
         incontro.put("url",this.url);
 
         return incontro;
+    }
+
+    public Bundle getAsBundle() {
+        Bundle incontro = new Bundle();
+        incontro.putString("titolo",this.titolo);
+        incontro.putString("data",this.data);
+        incontro.putString("luogo",this.luogo);
+        incontro.putString("occasione",this.occasione);
+        incontro.putString("momento",this.momento);
+        incontro.putString("mediaType",this.mediaType);
+        incontro.putString("url",this.url);
+
+        return incontro;
+    }
+
+    public static Incontro getFromBundle(Bundle bundle) {
+        return new Incontro(
+                bundle.getString("titolo"),
+                bundle.getString("data"),
+                bundle.getString("luogo"),
+                bundle.getString("occasione"),
+                bundle.getString("momento"),
+                bundle.getString("mediaType"),
+                bundle.getString("url")
+        );
     }
 }
