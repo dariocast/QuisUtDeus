@@ -1,6 +1,7 @@
 <resources>
-    <string name="app_name">QuisUtDeus</string>
-    <string name="action_settings">Settings</string>
+    <string name="app_name">Quis Ut Deus</string>
+    <string name="info_message">L\'app Quis Ut Deus consente di ascoltare le registrazioni di omelie e incontri tenuti da Don Pasquale Irolla. L\'app fornisce anche alcune informazioni aggiuntive in merito alla registrazione come luogo, data e occasione.</string>
+    <string name="action_info">Informazioni</string>
     <string name="view">view</string>
     <string name="previous">previous</string>
     <string name="next">next</string>

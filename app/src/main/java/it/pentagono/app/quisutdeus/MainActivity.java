@@ -1,5 +1,7 @@
 package it.pentagono.app.quisutdeus;
 
+import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -56,6 +58,11 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
         if(!isConnected()) {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setMessage("Controlla la connessione Internet!")
@@ -70,28 +77,15 @@ public class MainActivity extends AppCompatActivity {
             AlertDialog dialog = builder.create();
             dialog.show();
         } else {
-            lv_lista = findViewById(R.id.lv_lista);
-
-            try {
-                incontri = new Getter().execute().get();
-            } catch (InterruptedException | ExecutionException e) {
-                e.printStackTrace();
-            }
-
-            adapter = new IncontroAdapter(MainActivity.this,R.layout.incontro_list_item,incontri);
-            lv_lista.setAdapter(adapter);
-            lv_lista.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                    Incontro item = (Incontro) lv_lista.getItemAtPosition(i);
-                    Intent mp3Intent = new Intent();
-                    mp3Intent.setClass(MainActivity.this,StreamingMp3Player.class);
-                    mp3Intent.putExtra("url",item.url);
-                    mp3Intent.putExtra("incontro",item.getAsBundle());
-                    startActivity(mp3Intent);
-                }
-            });
+            populateView();
         }
+
+    }
+
+    public void populateView() {
+        lv_lista = findViewById(R.id.lv_lista);
+
+        new Getter().execute();
     }
 
     @Override
@@ -109,15 +103,38 @@ public class MainActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        if (id == R.id.action_info) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+            builder.setMessage(R.string.info_message)
+                    .setIcon(R.mipmap.quisutdeus_logo)
+                    .setTitle(R.string.action_info)
+                    .setCancelable(false)
+                    .setNeutralButton("Indietro", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            dialogInterface.dismiss();
+                        }
+                    });
+            // Create the AlertDialog object and return it
+            builder.create().show();
         }
 
         return super.onOptionsItemSelected(item);
     }
     class Getter extends AsyncTask<Void, Void, ArrayList<Incontro>> {
+        private ProgressDialog dialog;
 
         static final String url= "http://dariocast.altervista.org/quisutdeus/lista_json.php";
+
+        public Getter() {
+            this.dialog = new ProgressDialog(MainActivity.this);
+        }
+
+        @Override
+        protected void onPreExecute() {
+            this.dialog.setMessage("Caricamento...");
+            this.dialog.show();
+        }
 
         @Override
         protected ArrayList<Incontro> doInBackground(Void... voids) {
@@ -148,6 +165,27 @@ public class MainActivity extends AppCompatActivity {
             }
 
             return toReturn;
+        }
+
+        @Override
+        protected void onPostExecute(ArrayList<Incontro> incontros) {
+            if (dialog.isShowing()) {
+                dialog.dismiss();
+            }
+            incontri = incontros;
+            adapter = new IncontroAdapter(MainActivity.this,R.layout.incontro_list_item,incontri);
+            lv_lista.setAdapter(adapter);
+            lv_lista.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                    Incontro item = (Incontro) lv_lista.getItemAtPosition(i);
+                    Intent mp3Intent = new Intent();
+                    mp3Intent.setClass(MainActivity.this,StreamingMp3Player.class);
+                    mp3Intent.putExtra("url",item.url);
+                    mp3Intent.putExtra("incontro",item.getAsBundle());
+                    startActivity(mp3Intent);
+                }
+            });
         }
     }
 }
