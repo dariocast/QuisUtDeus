@@ -172,20 +172,25 @@ public class MainActivity extends AppCompatActivity {
             if (dialog.isShowing()) {
                 dialog.dismiss();
             }
-            incontri = incontros;
-            adapter = new IncontroAdapter(MainActivity.this,R.layout.incontro_list_item,incontri);
-            lv_lista.setAdapter(adapter);
-            lv_lista.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                    Incontro item = (Incontro) lv_lista.getItemAtPosition(i);
-                    Intent mp3Intent = new Intent();
-                    mp3Intent.setClass(MainActivity.this,StreamingMp3Player.class);
-                    mp3Intent.putExtra("url",item.url);
-                    mp3Intent.putExtra("incontro",item.getAsBundle());
-                    startActivity(mp3Intent);
-                }
-            });
+            if (incontros==null) {
+                dialog.setMessage("Errore nel caricamento");
+                dialog.show();
+            } else {
+                incontri = incontros;
+                adapter = new IncontroAdapter(MainActivity.this,R.layout.incontro_list_item,incontri);
+                lv_lista.setAdapter(adapter);
+                lv_lista.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                        Incontro item = (Incontro) lv_lista.getItemAtPosition(i);
+                        Intent mp3Intent = new Intent();
+                        mp3Intent.setClass(MainActivity.this,StreamingMp3Player.class);
+                        mp3Intent.putExtra("url",item.url);
+                        mp3Intent.putExtra("incontro",item.getAsBundle());
+                        startActivity(mp3Intent);
+                    }
+                });
+            }
         }
     }
 }

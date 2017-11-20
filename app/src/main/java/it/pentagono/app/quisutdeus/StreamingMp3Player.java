@@ -5,6 +5,7 @@ package it.pentagono.app.quisutdeus;
  */
 import android.app.Activity;
 import android.content.Intent;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnBufferingUpdateListener;
 import android.media.MediaPlayer.OnCompletionListener;
@@ -20,6 +21,7 @@ import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 public class StreamingMp3Player extends Activity implements OnClickListener, OnTouchListener, OnCompletionListener, OnBufferingUpdateListener {
@@ -67,8 +69,18 @@ public class StreamingMp3Player extends Activity implements OnClickListener, OnT
         mediaPlayer.setOnCompletionListener(this);
         try {
             mediaPlayer.setDataSource(url);
-            mediaPlayer.prepare(); // you must call this method after setup the datasource in setDataSource method. After calling prepare() the instance of MediaPlayer starts load data from URL to internal buffer.
-        } catch (Exception e) {
+            mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        mediaPlayer.prepare(); // you must call this method after setup the datasource in setDataSource method. After calling prepare() the instance of MediaPlayer starts load data from URL to internal buffer.
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }).run();
+        } catch (IOException e) {
             e.printStackTrace();
         }
         mediaFileLengthInMilliseconds = mediaPlayer.getDuration(); // gets the song length in milliseconds from URL
