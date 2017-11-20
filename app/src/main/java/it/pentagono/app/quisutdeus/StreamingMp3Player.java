@@ -84,7 +84,7 @@ public class StreamingMp3Player extends Activity implements OnClickListener, OnT
             e.printStackTrace();
         }
         mediaFileLengthInMilliseconds = mediaPlayer.getDuration(); // gets the song length in milliseconds from URL
-        tempo.setText(String.format("%d.%d",
+        tempo.setText(String.format("%02d.%02d minuti",
                 TimeUnit.MILLISECONDS.toMinutes(mediaFileLengthInMilliseconds),
                 TimeUnit.MILLISECONDS.toSeconds(mediaFileLengthInMilliseconds) -
                         TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(mediaFileLengthInMilliseconds))
