@@ -9,9 +9,12 @@ import android.util.Log;
 
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
+import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
 
 import java.util.Map;
 
+import it.pentagono.app.quisutdeus.BuildConfig;
 import it.pentagono.app.quisutdeus.R;
 
 /**
@@ -30,7 +33,15 @@ public class QUDFirebaseMessagingService extends FirebaseMessagingService {
                         .setContentText(remoteMessage.getNotification().getBody());
         Map<String,String> data = remoteMessage.getData();
         if (data.containsKey("tipo") || data.get("tipo").equals("update")) {
-            String url = "https://www.dropbox.com/s/5o6xcmxr29o6t7v/quis_ut_deus.apk";
+            FirebaseRemoteConfig mFirebaseRemoteConfig = FirebaseRemoteConfig.getInstance();
+            // [END get_remote_config_instance]
+            // Set default Remote Config parameter values. An app uses the in-app default values, and
+            // when you need to adjust those defaults, you set an updated value for only the values you
+            // want to change in the Firebase console. See Best Practices in the README for more
+            // information.
+            // [START set_default_values]
+            mFirebaseRemoteConfig.setDefaults(R.xml.remote_config_defaults);
+            String url = mFirebaseRemoteConfig.getString("updated_apk_url");
             Intent i = new Intent(Intent.ACTION_VIEW);
             i.setData(Uri.parse(url));
             PendingIntent contentIntent = PendingIntent.getActivity(this, 0, i,  PendingIntent.FLAG_UPDATE_CURRENT);
