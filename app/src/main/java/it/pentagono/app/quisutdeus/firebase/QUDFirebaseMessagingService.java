@@ -30,7 +30,8 @@ public class QUDFirebaseMessagingService extends FirebaseMessagingService {
                 new NotificationCompat.Builder(this)
                         .setSmallIcon(R.mipmap.quisutdeus_logo)
                         .setContentTitle("Quis Ut Deus")
-                        .setContentText(remoteMessage.getNotification().getBody());
+                        .setContentText(remoteMessage.getNotification().getBody())
+                        .setAutoCancel(true);
         Map<String,String> data = remoteMessage.getData();
         if (data.containsKey("tipo") || data.get("tipo").equals("update")) {
             FirebaseRemoteConfig mFirebaseRemoteConfig = FirebaseRemoteConfig.getInstance();
@@ -41,6 +42,7 @@ public class QUDFirebaseMessagingService extends FirebaseMessagingService {
             // information.
             // [START set_default_values]
             mFirebaseRemoteConfig.setDefaults(R.xml.remote_config_defaults);
+            mFirebaseRemoteConfig.fetch();
             String url = mFirebaseRemoteConfig.getString("updated_apk_url");
             Intent i = new Intent(Intent.ACTION_VIEW);
             i.setData(Uri.parse(url));
