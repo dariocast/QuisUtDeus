@@ -24,7 +24,7 @@ import android.widget.TextView;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
-public class StreamingMp3Player extends Activity implements OnClickListener, OnTouchListener, OnCompletionListener, OnBufferingUpdateListener {
+public class StreamingMp3Player extends Activity implements OnClickListener, OnTouchListener, OnCompletionListener, MediaPlayer.OnPreparedListener, OnBufferingUpdateListener {
 
     private ImageButton buttonPlayPause;
     private SeekBar seekBarProgress;
@@ -67,28 +67,15 @@ public class StreamingMp3Player extends Activity implements OnClickListener, OnT
         mediaPlayer = new MediaPlayer();
         mediaPlayer.setOnBufferingUpdateListener(this);
         mediaPlayer.setOnCompletionListener(this);
+        mediaPlayer.setOnPreparedListener(this);
         try {
             mediaPlayer.setDataSource(url);
             mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        mediaPlayer.prepare(); // you must call this method after setup the datasource in setDataSource method. After calling prepare() the instance of MediaPlayer starts load data from URL to internal buffer.
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }).run();
+            mediaPlayer.prepareAsync(); // you must call this method after setup the datasource in setDataSource method. After calling prepare() the instance of MediaPlayer starts load data from URL to internal buffer.
+            buttonPlayPause.setEnabled(false);
         } catch (IOException e) {
             e.printStackTrace();
         }
-        mediaFileLengthInMilliseconds = mediaPlayer.getDuration(); // gets the song length in milliseconds from URL
-        tempo.setText(String.format("%02d.%02d minuti",
-                TimeUnit.MILLISECONDS.toMinutes(mediaFileLengthInMilliseconds),
-                TimeUnit.MILLISECONDS.toSeconds(mediaFileLengthInMilliseconds) -
-                        TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(mediaFileLengthInMilliseconds))
-        ));
     }
 
     /**
@@ -135,6 +122,8 @@ public class StreamingMp3Player extends Activity implements OnClickListener, OnT
         return false;
     }
 
+
+
     @Override
     public void onCompletion(MediaPlayer mp) {
         /** MediaPlayer onCompletion event handler. Method which calls then song playing is complete*/
@@ -167,4 +156,14 @@ public class StreamingMp3Player extends Activity implements OnClickListener, OnT
         seekBarProgress.setSecondaryProgress(percent);
     }
 
+    @Override
+    public void onPrepared(MediaPlayer mediaPlayer) {
+        mediaFileLengthInMilliseconds = mediaPlayer.getDuration(); // gets the song length in milliseconds from URL
+        tempo.setText(String.format("%02d.%02d minuti",
+                TimeUnit.MILLISECONDS.toMinutes(mediaFileLengthInMilliseconds),
+                TimeUnit.MILLISECONDS.toSeconds(mediaFileLengthInMilliseconds) -
+                        TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(mediaFileLengthInMilliseconds))
+        ));
+        buttonPlayPause.setEnabled(true);
+    }
 }
